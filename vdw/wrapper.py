@@ -11,7 +11,7 @@ def wrapper(vdw_cls, mf, **kwargs):
             self.with_vdw = with_vdw
             self._keys.update("with_vdw")
 
-        def dump_flags(self, verbose=None):
+        def dump_flags(self, verbose=0):
             mf_cls.dump_flags(self, verbose)
             if self.with_vdw:
                 self.with_vdw.dump_flags(verbose)

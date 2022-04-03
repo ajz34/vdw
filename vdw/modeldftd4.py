@@ -13,7 +13,9 @@ class WithDFTD4(lib.StreamObject):
     xc = None
     param = None
     verbose = None
+    do_grad = False
 
+    _result = None
     _param = None
 
     def __init__(self, mf, xc=None, param=None):
@@ -57,17 +59,23 @@ class WithDFTD4(lib.StreamObject):
     def eng(self):
         self.parse_config()
         model = DispersionModel(self.mol.atom_charges(), self.mol.atom_coords())
-        return model.get_dispersion(self._param, grad=False)["energy"]
+        self._result = model.get_dispersion(self._param, grad=self.do_grad)
+        return self._result["energy"]
 
     @property
     def grad(self):
+        if self._result is not None and "gradient" in self._result:
+            return self._result["gradient"]
         self.parse_config()
         model = DispersionModel(self.mol.atom_charges(), self.mol.atom_coords())
-        return model.get_dispersion(self._param, grad=True)["gradient"]
+        self._result = model.get_dispersion(self._param, grad=True)
+        return self._result["gradient"]
 
 
-def to_dftd4(mf, **kwargs):
-    return wrapper(WithDFTD4, mf, **kwargs)
+def to_dftd4(mf, do_grad=False, **kwargs):
+    wrap = wrapper(WithDFTD4, mf, **kwargs)
+    wrap.with_vdw.do_grad = do_grad
+    return wrap
 
 
 if __name__ == '__main__':
