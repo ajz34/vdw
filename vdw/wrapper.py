@@ -1,7 +1,7 @@
 from pyscf import lib
 
 
-def wrapper(vdw_cls, mf, **kwargs):
+def wrapper(vdw_cls, mf, return_instance=True, **kwargs):
     with_vdw = vdw_cls(mf, **kwargs)
     mf_cls = mf.__class__
 
@@ -34,7 +34,10 @@ def wrapper(vdw_cls, mf, **kwargs):
 
         Gradients = lib.alias(nuc_grad_method, alias_name='Gradients')
 
-    return VDWInner(mf, with_vdw)
+    if return_instance:
+        return VDWInner(mf, with_vdw)
+    else:
+        return VDWInner
 
 
 def grad_vdw(mf_grad):
