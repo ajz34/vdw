@@ -185,8 +185,7 @@ def to_tsvdw(mf, **kwargs):
             result = mf_cls.kernel(self, *args, **kwargs)
             self.e_vdw = self.with_vdw.eng
             self.e_tot += self.e_vdw
-            result[1] = self.e_tot
-            return result
+            return self.e_tot
 
     with_vdw = WithTSvDW(mf, **kwargs)
     obj = TSvDWInner(mf, with_vdw)
@@ -218,7 +217,7 @@ def mbd():
     mol = gto.Mole()
     mol.atom = """
     O 0 0 0; H 0 0 1; H 0 1 0;
-    O 0 0 2; H 0 0 3; H 0 1 2
+    O 0 0 3; H 0 0.5 3.5; H 0 -0.5 3.5
     """
     mol.basis = "cc-pVDZ"
     mol.build()
@@ -226,12 +225,13 @@ def mbd():
     wv = WithTSvDW(mf)
     wv.parse_config()
     wv.perform_params()
+    print(wv.eng)
 
     from pymbd.fortran import MBDGeom
     wm = MBDGeom(mol.atom_coords())
-    print(wm.mbd_energy(wv._result["alpha_eff"], wv._result["C6_eff"], wv._result["R0_eff"], a=2.56, beta=1, variant="scs", force=False))
-    print(wm.mbd_energy(wv._result["alpha_eff"], wv._result["C6_eff"], wv._result["R0_eff"], a=2.56, beta=1, variant="scs", force=True))
+    print(wm.ts_energy(wv._result["alpha_eff"], wv._result["C6_eff"], wv._result["R0_eff"], 0.94, force=True))
 
 
 if __name__ == '__main__':
+    main()
     mbd()

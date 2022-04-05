@@ -28,7 +28,7 @@ from vdw.util.sph_dft_elements import NRSRHFS_CONFIGURATION
 from scipy.interpolate import make_interp_spline
 
 
-def get_atm_nrks(mol, atomic_configuration=NRSRHFS_CONFIGURATION, xc='slater', grid=(120, 770), basis="aug-cc-pV5Z"):
+def get_atm_nrks(mol, atomic_configuration=NRSRHFS_CONFIGURATION, xc='slater', grid=(120, 770), basis="aug-cc-pVQZ"):
     if isinstance(mol, scf.hf.SCF):
         xc = getattr(mol, "xc", "HF")
         mol = mol.mol

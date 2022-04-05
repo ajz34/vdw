@@ -23,6 +23,7 @@ class HirshfeldAnalysis:
     def perform_free_atom(self):
         result = self.result
         mf = self.mf
+        mol = self.mol
 
         result["mf_elem"] = {}
         result["V_free_elem"] = {}
