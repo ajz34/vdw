@@ -50,7 +50,8 @@ class WithTSvDW(lib.StreamObject):
         xc = self.xc.lower().replace(" ", "").replace("-", "")
         self.sR = DICT_sR[xc]
 
-    def perform_eng(self):
+    def perform_params(self):
+        result = self._result
         mf = self.mf
         mol = self.mol  # type: gto.Mole
         ni = dft.numint.NumInt()
@@ -61,7 +62,6 @@ class WithTSvDW(lib.StreamObject):
             grids.build()
         rho = ni.get_rho(mol, mf.make_rdm1(), grids)
 
-        result = {}
         result["mf_elem"] = {}
         result["V_free"] = {}
         result["spl_free"] = {}
@@ -94,6 +94,25 @@ class WithTSvDW(lib.StreamObject):
         C6_eff = C6_free * V_ratio**2
         R0_eff = R0_free * V_ratio**(1/3)
 
+        result["V_free"] = V_free
+        result["alpha_free"] = alpha_free
+        result["C6_free"] = C6_free
+        result["R0_free"] = R0_free
+        result["V_eff"] = V_eff
+        result["alpha_eff"] = alpha_eff
+        result["C6_eff"] = C6_eff
+        result["R0_eff"] = R0_eff
+
+    def perform_eng(self):
+        mol = self.mol
+        result = self._result
+        if "alpha_eff" not in result:
+            self.perform_params()
+
+        alpha_eff = result["alpha_eff"]
+        C6_eff = result["C6_eff"]
+        R0_eff = result["R0_eff"]
+
         dist_comp = mol.atom_coords()[:, None, :] - mol.atom_coords()[None, :, :]
         dist = np.linalg.norm(dist_comp, axis=-1)
         np.fill_diagonal(dist, np.inf)
@@ -107,22 +126,14 @@ class WithTSvDW(lib.StreamObject):
         vdw_pair = -0.5 * C6_pair * dist**(-6) * f_damp_pair
         eng_vdw = vdw_pair.sum()
 
-        result["V_free"] = V_free
-        result["alpha_free"] = alpha_free
-        result["C6_free"] = C6_free
-        result["R0_free"] = R0_free
-        result["V_eff"] = V_eff
-        result["alpha_eff"] = alpha_eff
-        result["C6_eff"] = C6_eff
-        result["R0_eff"] = R0_eff
         result["vdw_pair"] = vdw_pair
         result["C6_pair"] = C6_pair
         result["eng_vdw"] = eng_vdw
-        self._result.update(result)
 
     def perform_grad(self):
         warnings.warn("This gradient implementation for TS-vDW does not count density relaxization into account.\n"
                       "Use this gradient with caution!")
+        mol = self.mol
         result = self._result
         if "eng_vdw" not in result:
             self.perform_eng()
@@ -183,7 +194,7 @@ def to_tsvdw(mf, **kwargs):
     return obj
 
 
-if __name__ == '__main__':
+def main():
     mol = gto.Mole()
     mol.atom = """
     O 0 0 0; H 0 0 1; H 0 1 0;
@@ -202,3 +213,25 @@ if __name__ == '__main__':
     print(w0.eng)
     print(w0.grad)
 
+
+def mbd():
+    mol = gto.Mole()
+    mol.atom = """
+    O 0 0 0; H 0 0 1; H 0 1 0;
+    O 0 0 2; H 0 0 3; H 0 1 2
+    """
+    mol.basis = "cc-pVDZ"
+    mol.build()
+    mf = dft.RKS(mol, xc="PBE").run()
+    wv = WithTSvDW(mf)
+    wv.parse_config()
+    wv.perform_params()
+
+    from pymbd.fortran import MBDGeom
+    wm = MBDGeom(mol.atom_coords())
+    print(wm.mbd_energy(wv._result["alpha_eff"], wv._result["C6_eff"], wv._result["R0_eff"], a=2.56, beta=1, variant="scs", force=False))
+    print(wm.mbd_energy(wv._result["alpha_eff"], wv._result["C6_eff"], wv._result["R0_eff"], a=2.56, beta=1, variant="scs", force=True))
+
+
+if __name__ == '__main__':
+    mbd()
