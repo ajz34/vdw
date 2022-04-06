@@ -1,12 +1,3 @@
-try:
-    import pymbd
-except ImportError:
-    raise ImportError("pymbd package could not be imported.\n"
-                      "Please use the following bash script to install pymbd:\n"
-                      "$ conda install -c conda-forge libmbd\n"
-                      "$ pip install pymbd\n"
-                      "Also see https://github.com/libmbd/libmbd")
-
 from pymbd.fortran import MBDGeom
 from pymbd.pymbd import vdw_params
 from vdw.util.hirshfeld import HirshfeldAnalysis

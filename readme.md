@@ -3,8 +3,7 @@
 This package is my naïve wrapper of various existing vDW libraries for PySCF. Should be able to evaluate energy or force
 (gradient) of van der Waals correction to density functional methods.
 
-You may need to further install other required packages from conda or pip. This package actually does not implement
-algorithms for vDW.
+This package is not aimed to be a pyscf extension module. It's just a wrapper.
 
 ## Install
 
@@ -17,15 +16,21 @@ pip install pyvdw
 To use DFTD3, DFTD4, or TS-vDW (from libmbd) or MBD methods, you may also manually install those libraries.
 This package is only an interface to those existing libraries.
 
+```bash
+conda install simple-dftd3 dftd3-python dftd4 dftd4-python libmbd
+pip install pyscf, pymbd
+```
+
+I know that leaving the task of dependency packages installation to user is really inconvenient, but currently
+I don't know how to handle conda, pip and advanced packaging elegently. So if any pratical ideas on this, raise
+your issue >w<
+
 ## Included vDW models
 
 ### DFTD3
 
 * Package: `simple-dftd3`, https://github.com/awvwgk/simple-dftd3
-* Install:
-  ```bash
-  conda install simple-dftd3 -c conda-forge
-  ```
+
 * Usage:
   ```python
   from pyscf import gto, dft
@@ -68,10 +73,7 @@ This package is only an interface to those existing libraries.
 ### DFTD4
 
 * Package: `dftd4`, https://github.com/dftd4/dftd4
-* Install:
-  ```bash
-  conda install dftd4 -c conda-forge
-  ```
+
 * Usage:
   ```python
   from pyscf import gto, dft
@@ -108,11 +110,6 @@ This package is only an interface to those existing libraries.
 ### TS and MBD
 
 * Package: `libmbd`, https://github.com/libmbd/libmbd
-* Install:
-  ```bash
-  conda install libmbd -c conda-forge
-  pip install pymbd
-  ```
 
 * Usage:
   ```python
@@ -142,6 +139,8 @@ This package is only an interface to those existing libraries.
 
 * Citations:
 
+    This is not formal citation recommendation
+
   * TS (Tkatchenko-Scheffler)
 
     Tkatchenko, A.; Scheffler, M.
@@ -168,5 +167,4 @@ This package uses or modifies existing codes.
 
 The author is aware of previous efforts to implement vDW for PySCF, such as [pyscf/dftd3](https://github.com/pyscf/dftd3)
 and [pyscf/mbd](https://github.com/pyscf/mbd). However, due to my own requirement for usage and API convenience, as well
-as my need to use TS-vDW, this simple hundreds-lines-of-code tiny package is built from existing various libraries
-for PySCF.
+as my need to use TS-vDW, this simple hundreds-lines-of-code tiny package is built from existing various libraries.

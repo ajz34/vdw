@@ -1,11 +1,3 @@
-try:
-    import dftd3
-except ImportError:
-    raise ImportError("dftd3 package could not be imported.\n"
-                      "Please use the following bash script to install simple-dftd3:\n"
-                      "$ conda install simple-dftd3 -c conda-forge\n"
-                      "Also see https://github.com/awvwgk/simple-dftd3")
-
 from dftd3.parameters import get_damping_param
 from dftd3.interface import (
     DispersionModel, RationalDampingParam, ZeroDampingParam,
