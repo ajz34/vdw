@@ -1,6 +1,6 @@
 # vdw (wrapper of existing vDW packages for PySCF)
 
-This package is a wrapper of various existing vDW libraries for PySCF.
+This package is my wrapper of various existing vDW libraries for PySCF.
 
 You may need to further install other required packages from conda or pip.
 
