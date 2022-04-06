@@ -1,3 +1,11 @@
+try:
+    import dftd4
+except ImportError:
+    raise ImportError("dftd4 package could not be imported.\n"
+                      "Please use the following bash script to install dftd4:\n"
+                      "$ conda install dftd4 -c conda-forge\n"
+                      "Also see https://github.com/dftd4/dftd4")
+
 from dftd4.parameters import get_damping_param
 from dftd4.interface import DispersionModel, DampingParam
 from vdw.wrapper import wrapper

@@ -1,3 +1,12 @@
+try:
+    import pymbd
+except ImportError:
+    raise ImportError("pymbd package could not be imported.\n"
+                      "Please use the following bash script to install pymbd:\n"
+                      "$ conda install -c conda-forge libmbd\n"
+                      "$ pip install pymbd\n"
+                      "Also see https://github.com/libmbd/libmbd")
+
 from pymbd.fortran import MBDGeom
 from pymbd.pymbd import vdw_params
 from vdw.util.hirshfeld import HirshfeldAnalysis
@@ -180,7 +189,7 @@ def to_mbd(mf, **kwargs):
             return mf.energy_nuc()
 
         def kernel(self, *args, **kwargs):
-            result = mf_cls.kernel(self, *args, **kwargs)
+            mf_cls.kernel(self, *args, **kwargs)
             self.e_vdw = self.with_vdw.eng
             self.e_tot += self.e_vdw
             return self.e_tot

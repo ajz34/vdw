@@ -1,3 +1,11 @@
+try:
+    import dftd3
+except ImportError:
+    raise ImportError("dftd3 package could not be imported.\n"
+                      "Please use the following bash script to install simple-dftd3:\n"
+                      "$ conda install simple-dftd3 -c conda-forge\n"
+                      "Also see https://github.com/awvwgk/simple-dftd3")
+
 from dftd3.parameters import get_damping_param
 from dftd3.interface import (
     DispersionModel, RationalDampingParam, ZeroDampingParam,
@@ -104,7 +112,7 @@ def to_dftd3(mf, do_grad=False, **kwargs):
     return wrap
 
 
-if __name__ == '__main__':
+def main():
     from pyscf import dft
     mol = gto.Mole(atom="""
     C   1.40000000   0.00000000   0.00000000
@@ -139,7 +147,8 @@ if __name__ == '__main__':
     WithDFTD3(mf).dump_flags(0)
     assert np.allclose(WithDFTD3(mf).eng, -2.9109185161490E-02)
     assert np.allclose(WithDFTD3(mol, xc="PBE0").eng, -2.9109185161490E-02)
-    assert np.allclose(WithDFTD3(mol, version="bj", param={"s8": 1.2177, "a1": 0.4145, "a2": 4.8593}).eng, -2.9109185161490E-02)
+    assert np.allclose(WithDFTD3(mol, version="bj", param={"s8": 1.2177, "a1": 0.4145, "a2": 4.8593}).eng,
+                       -2.9109185161490E-02)
     # Zero PBE0
     assert np.allclose(WithDFTD3(mf, version="zero").eng, -1.4174415944614E-02)
 
@@ -162,3 +171,7 @@ if __name__ == '__main__':
                    H                 -0.00000000    0.89830571    0.52404783 ''')
     g = mf.nuc_grad_method().kernel()
     print((e1 - e2)/0.002 * lib.param.BOHR - g[0, 2])
+
+
+if __name__ == '__main__':
+    main()
