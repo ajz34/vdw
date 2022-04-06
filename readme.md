@@ -1,13 +1,21 @@
-# vdw (wrapper of existing vDW packages for PySCF)
+# vdw (my naïve wrapper of existing vDW packages for PySCF)
 
-This package is my wrapper of various existing vDW libraries for PySCF.
+This package is my naïve wrapper of various existing vDW libraries for PySCF. Should be able to evaluate energy or force
+(gradient) of van der Waals correction to density functional methods.
 
-You may need to further install other required packages from conda or pip.
+You may need to further install other required packages from conda or pip. This package actually does not implement
+algorithms for vDW.
 
-The author is aware of previous efforts to implement vDW for PySCF, such as [pyscf/dftd3](https://github.com/pyscf/dftd3)
-and [pyscf/mbd](https://github.com/pyscf/mbd). However, due to my own requirement for usage and API convenience, as well
-as my need to use TS-vDW, this simple hundreds-lines-of-code tiny package is built from existing various libraries
-for PySCF.
+## Install
+
+To install this package, you may download from pypi:
+
+```bash
+pip install pyvdw
+```
+
+To use DFTD3, DFTD4, or TS-vDW (from libmbd) or MBD methods, you may also manually install those libraries.
+This package is only an interface to those existing libraries.
 
 ## Included vDW models
 
@@ -97,7 +105,7 @@ for PySCF.
     Santra, G.; Sylvetsky, N.; Martin, J. M. L.
     *J. Phys. Chem. A* **2019**, *123* (24), 5129–5143. https://doi.org/10.1021/acs.jpca.9b03157.
 
-### Many-Body Dispersion and Tkatchenko-Scheffler
+### TS and MBD
 
 * Package: `libmbd`, https://github.com/libmbd/libmbd
 * Install:
@@ -125,14 +133,21 @@ for PySCF.
   print(mf.e_vdw)  # -0.001245831
   ```
 
+* Notice
+
+  To calculate MBD or TS-vDW, free atomic volume is required. This is calculated, instead of preloaded,
+  using basis set aug-cc-pVQZ. Value of this volume may be close to FHI-aims and Quantum Espresso. However,
+  this calculation is relatively costly if your molecule and basis set is not large. Basis set error also
+  occurs (where FHI-aims give free folume by highly efficient numerical radial Schrödinger equation).
+
 * Citations:
 
-  * Tkatchenko-Scheffler
+  * TS (Tkatchenko-Scheffler)
 
     Tkatchenko, A.; Scheffler, M.
     *Phys. Rev. Lett.* **2009**, *102* (7), 073005. https://doi.org/10.1103/PhysRevLett.102.073005.
 
-  * MBD
+  * MBD (Many-Body Dispersion)
 
     Tkatchenko, A.; DiStasio, R. A.; Car, R.; Scheffler, M.
     *Phys. Rev. Lett.* **2012**, *108* (23), 236402. https://doi.org/10.1103/PhysRevLett.108.236402.
@@ -143,3 +158,15 @@ for PySCF.
 ## More Examples
 
 Refer to [example](example) folder for more examples.
+
+## Code Sources
+
+This package uses or modifies existing codes.
+* Hirshfeld analysis utilizes atomic spherically averaged DFT [pyscf/pyscf #1143](https://github.com/pyscf/pyscf/pull/1143).
+* Wrapper code utilizes [pyscf/dftd3](https://github.com/pyscf/dftd3).
+* Functional default parameters of TS-vDW and MBD are from [libmbd/libmbd](https://github.com/libmbd/libmbd).
+
+The author is aware of previous efforts to implement vDW for PySCF, such as [pyscf/dftd3](https://github.com/pyscf/dftd3)
+and [pyscf/mbd](https://github.com/pyscf/mbd). However, due to my own requirement for usage and API convenience, as well
+as my need to use TS-vDW, this simple hundreds-lines-of-code tiny package is built from existing various libraries
+for PySCF.
