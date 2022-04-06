@@ -19,8 +19,10 @@ def wrapper(vdw_cls, mf, return_instance=True, **kwargs):
 
         def energy_nuc(self):
             enuc = mf_cls.energy_nuc(self)
+            evdw = self.with_vdw.eng
+            self.e_vdw = evdw
             if self.with_vdw:
-                enuc += self.with_vdw.eng
+                enuc += evdw
             return enuc
 
         def reset(self, mol=None):

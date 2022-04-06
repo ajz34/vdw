@@ -12,6 +12,8 @@ def obtain_ts_vdw_from_mf():
         H  0.  0.  3.
         H  0.  1.  2.
     """).build()
+
+    # Example:
     mf_bare = dft.RKS(mol, xc="PBE").run()
     mf = to_mbd(dft.RKS(mol, xc="PBE"), variant="ts").run()
     print(mf.e_tot - mf_bare.e_tot)
@@ -26,6 +28,12 @@ def obtain_ts_vdw_from_mf():
     # 0.00000000    -0.00002185     0.00005286
     # 0.00000000     0.00000911    -0.00007099
     # 0.00000000     0.00002288     0.00007404
+
+    # set parameters for unknown xc
+    # WARNING!!! Following code does not suggests cam-b3lyp use sr=1.05! Only for API illustration!
+    #            Parameter sr is s_R, where for PBE this value is 0.94
+    mf = to_mbd(dft.RKS(mol, xc="CAM-B3LYP"), variant="ts", sr=1.05).run()
+    print(mf.e_vdw)
 
 
 if __name__ == '__main__':
