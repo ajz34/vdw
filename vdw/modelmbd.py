@@ -1,10 +1,7 @@
-from pymbd.pymbd import from_volumes
 from pymbd.fortran import MBDGeom
-
 from pymbd.pymbd import vdw_params
 from vdw.util.hirshfeld import HirshfeldAnalysis
 from pyscf import scf, mcscf, lib
-from pyscf.lib import logger
 import numpy as np
 
 from vdw.wrapper import wrapper
@@ -83,29 +80,29 @@ class WithMBD(lib.StreamObject):
     def parse_config(self):
         xc = self.xc.lower().replace(" ", "").replace("-", "")
         variant = self.variant.lower().replace(" ", "").replace("-", "").replace("@", "")
-        if variant == "ts":
+        if variant in ("ts", "tsvdw"):
             self.sr = DEFAULT_TS_SR.get(xc)
             if self.sr is None:
                 raise ValueError("XC for TS-vDW not recognized!")
-        elif variant == "mbdrsscs" or "rsscs":
+        elif variant in ("mbdrsscs", "rsscs"):
             self.a = 6.0
             self.beta = DEFAULT_RSSCS_BETA.get(xc)
             self.damping = "fermi,dip"
             if self.beta is None:
                 raise ValueError("XC for MBD@RSSCS not recognized!")
-        elif variant == "mbdnl" or "nl":
+        elif variant in ("mbdnl", "nl"):
             self.a = 6.0
             self.beta = DEFAULT_NL_BETA.get(xc)
             self.damping = "fermi,dip"
             if self.beta is None:
                 raise ValueError("XC for MBD@NL not recognized!")
-        elif variant == "mbdts":
+        elif variant in ("mbdts", ):
             self.a = 6.0
             self.beta = DEFAULT_TS_BETA.get(xc)
             self.damping = "fermi"
             if self.beta is None:
                 raise ValueError("XC for MBD@TS not recognized!")
-        elif variant == "mbdscs" or "scs":
+        elif variant in ("mbdscs", "scs"):
             self.beta = 0.0
             self.a = DEFAULT_SCS_A.get(xc)
             self.damping = "fermi,dip"
@@ -136,7 +133,7 @@ class WithMBD(lib.StreamObject):
         alpha_eff, C6_eff, R0_eff = alpha_free * V_ratio, C6_free * V_ratio**2, R0_free * V_ratio**(1/3)
         mbd_obj = MBDGeom(self.mol.atom_coords())
         variant = self.variant.lower().replace(" ", "").replace("-", "").replace("@", "")
-        if variant == "ts":
+        if variant in ("ts", "tsvdw"):
             result = mbd_obj.ts_energy(alpha_eff, C6_eff, R0_eff, self.sr, force=self.do_grad)
         else:
             if variant in ("mbdrsscs", "rsscs"):
@@ -177,7 +174,7 @@ def to_mbd(mf, **kwargs):
     wrap_cls = wrapper(WithMBD, mf, return_instance=False, **kwargs)
     mf_cls = mf.__class__
 
-    class TSvDWInner(wrap_cls):
+    class MBDInner(wrap_cls):
 
         def energy_nuc(self):
             return mf.energy_nuc()
@@ -189,7 +186,7 @@ def to_mbd(mf, **kwargs):
             return self.e_tot
 
     with_vdw = WithMBD(mf, **kwargs)
-    obj = TSvDWInner(mf, with_vdw)
+    obj = MBDInner(mf, with_vdw)
     obj.with_vdw.mf = obj
     return obj
 
