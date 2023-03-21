@@ -17,8 +17,8 @@ To use DFTD3, DFTD4, or TS-vDW (from libmbd) or MBD methods, you may also manual
 This package is only an interface to those existing libraries.
 
 ```bash
-conda install simple-dftd3 dftd3-python dftd4 dftd4-python libmbd
-pip install pyscf, pymbd
+conda install simple-dftd3 dftd3-python dftd4 dftd4-python libmbd -c conda-forge
+pip install pyscf pymbd
 ```
 
 I know that leaving the task of dependency packages installation to user is really inconvenient, but currently

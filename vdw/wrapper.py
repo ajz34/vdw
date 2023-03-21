@@ -5,7 +5,7 @@ def wrapper(vdw_cls, mf, return_instance=True, **kwargs):
     with_vdw = vdw_cls(mf, **kwargs)
     mf_cls = mf.__class__
 
-    class VDWInner(vdw_cls, mf_cls, lib.StreamObject):
+    class VDWInner(mf_cls, lib.StreamObject):
         def __init__(self, mf, with_vdw):
             self.__dict__.update(mf.__dict__)
             self.with_vdw = with_vdw
@@ -52,7 +52,14 @@ def grad_vdw(mf_grad):
     cls_mf_grad = mf_grad.__class__
     with_vdw = mf_grad.base.with_vdw
 
-    class VDWGradInner(with_vdw.__class__, cls_mf_grad):
+    class VDWGradInner(cls_mf_grad):
+
+        def dump_flags(self, verbose=0):
+            cls_mf_grad.dump_flags(self, verbose)
+            if self.base.with_vdw:
+                self.base.with_vdw.dump_flags(verbose)
+            return self
+
         def grad_nuc(self, mol=None, atmlst=None):
             nuc_g = cls_mf_grad.grad_nuc(self, mol, atmlst)
             vdw_g = with_vdw.grad
